@@ -31,6 +31,10 @@ repos:
     - id: trailing-whitespace
     - id: flake8
     - id: requirements-txt-fixer
+-   repo: https://github.com/pre-commit/mirrors-pylint
+    rev: d230ffd
+    hooks:
+    -   id: pylint
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.7.3
   hooks:
