@@ -1,4 +1,5 @@
 from collections import namedtuple
+from typing import Optional
 
 from iglovikov_helper_functions.dl.pytorch.utils import rename_layers
 from timm import create_model as timm_create_model
@@ -15,9 +16,13 @@ models = {
 }
 
 
-def create_model(model_name: str) -> nn.Module:
+def create_model(model_name: str, activation: Optional[str] = "softmax") -> nn.Module:
     model = models[model_name].model
     state_dict = model_zoo.load_url(models[model_name].url, progress=True, map_location="cpu")["state_dict"]
     state_dict = rename_layers(state_dict, {"model.": ""})
     model.load_state_dict(state_dict)
+
+    if activation == "softmax":
+        return nn.Sequential(model, nn.Softmax(dim=1))
+
     return model
