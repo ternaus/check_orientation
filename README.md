@@ -47,7 +47,7 @@ python -m torch.distributed.launch --nproc_per_node=<num_gpu> check_orientation/
 ### Pre-trained models
 Models were pre-trained on the [OpenImages dataset](https://storage.googleapis.com/openimages/web/index.html).
 
-| Models        | Validation accuracy    | Config file  |
-| ------------- |:--------------------:| ------------:|
-| resnet18_2020-11-07      | 0.8314 | [Link](check_orientation/configs/2020-11-07.yaml) |
-| swsl_resnext50_32x4d|0.8388| [Link](check_orientation/configs/2020-11-08.yaml)|
+| Models        | Validation accuracy | Config file  | Weights |
+| ------------- |:--------------------:| :------------:| :------: |
+| resnet18_2020-11-07      | 0.8314 | [Link](check_orientation/configs/2020-11-07.yaml) | [Link](https://github.com/ternaus/check_orientation/releases/download/v0.0.1/2020-11-07_resnet18.zip") |
+| swsl_resnext50_32x4d|0.8388| [Link](check_orientation/configs/2020-11-08.yaml)| [Link](https://github.com/ternaus/check_orientation/releases/download/v0.0.2/2020-11-08_resnext50_32x4d.zip)|
