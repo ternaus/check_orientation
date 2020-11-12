@@ -7,7 +7,7 @@ from typing import List
 from setuptools import Command, find_packages, setup
 
 # Package meta-data.
-name = "check_orientatioin"
+name = "check_orientation"
 description = "Check if image was rotated by 90, 180, 270 degrees."
 url = "https://github.com/ternaus/check_orientation"
 email = "iglovikov@gmail.com"
