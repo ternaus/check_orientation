@@ -1,11 +1,16 @@
 exclude: _pb2\.py$
 repos:
+- repo: https://github.com/pre-commit/mirrors-isort
+  rev: f0001b2  # Use the revision sha / tag you want to point at
+  hooks:
+    - id: isort
+      args: ["--profile", "black"]
 - repo: https://github.com/psf/black
   rev: 20.8b1
   hooks:
     - id: black
 - repo: https://github.com/asottile/yesqa
-  rev: v1.2.2
+  rev: v1.1.0
   hooks:
   - id: yesqa
     additional_dependencies:
@@ -15,7 +20,7 @@ repos:
     - flake8-tidy-imports==4.1.0
     - flake8==3.7.9
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.3.0
+    rev: v2.3.0
     hooks:
     - id: check-docstring-first
     - id: check-json
@@ -24,18 +29,23 @@ repos:
     - id: debug-statements
     - id: end-of-file-fixer
     - id: trailing-whitespace
+    - id: flake8
     - id: requirements-txt-fixer
--   repo: https://gitlab.com/pycqa/flake8
-    rev: a4aeb2e209c64efcfadb43cb96809c1f5b80912b
+-   repo: https://github.com/pre-commit/mirrors-pylint
+    rev: d230ffd
     hooks:
-    -   id: flake8
+    -   id: pylint
+        args:
+        - --max-line-length=119
+        - --ignore-imports=yes
+        - -d duplicate-code
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.7.3
   hooks:
   - id: pyupgrade
-    args: ['--py36-plus']
+    args: ['--py37-plus']
 - repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.7.0
+  rev: v1.5.1
   hooks:
   - id: python-check-mock-methods
   - id: python-use-type-annotations

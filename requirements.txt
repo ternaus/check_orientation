@@ -2,7 +2,7 @@ albumentations
 iglovikov_helper_functions
 pytorch_lightning
 pytorch_toolbelt
-segmentation-models-pytorch
+timm
 torch
 tqdm
 wandb
