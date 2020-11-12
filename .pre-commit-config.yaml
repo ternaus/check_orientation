@@ -35,6 +35,10 @@ repos:
     rev: d230ffd
     hooks:
     -   id: pylint
+        args:
+        - --max-line-length=119
+        - --ignore-imports=yes
+        - -d duplicate-code
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.7.3
   hooks:
