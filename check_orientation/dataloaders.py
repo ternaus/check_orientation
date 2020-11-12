@@ -1,6 +1,6 @@
 import random
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 import albumentations as albu
 import numpy as np
