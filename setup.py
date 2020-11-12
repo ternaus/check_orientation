@@ -24,7 +24,7 @@ def get_version():
 
 # What packages are required for this module to be executed?
 try:
-    with open(os.path.join(current_dir, "requirements.txt"), encoding="utf-8") as f:
+    with open(os.path.join(current_dir, "requirements_lib.txt"), encoding="utf-8") as f:
         required = f.read().split("\n")
 except FileNotFoundError:
     required = []

@@ -1,7 +1,4 @@
 albumentations
 iglovikov_helper_functions
-pytorch_lightning
 timm
 torch
-tqdm
-wandb
