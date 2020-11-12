@@ -1,9 +1,8 @@
 import argparse
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 import albumentations as albu
-import cv2
 import numpy as np
 import torch
 import torch.nn.parallel
@@ -12,8 +11,12 @@ import torch.utils.data.distributed
 import yaml
 from albumentations.core.serialization import from_dict
 from iglovikov_helper_functions.config_parsing.utils import object_from_dict
-from iglovikov_helper_functions.dl.pytorch.utils import state_dict_from_disk, tensor_from_rgb_image
-from iglovikov_helper_functions.utils.image_utils import load_rgb, pad_to_size, unpad_from_size
+from iglovikov_helper_functions.dl.pytorch.utils import (
+    state_dict_from_disk,
+    tensor_from_rgb_image,
+)
+from iglovikov_helper_functions.utils.image_utils import load_rgb
+from torch import nn
 from torch.utils.data import Dataset
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm
@@ -66,13 +69,15 @@ def main():
         }
     )
 
-    output_mask_path = args.output_path
-    output_mask_path.mkdir(parents=True, exist_ok=True)
-    hparams["output_mask_path"] = output_mask_path
+    args.output_path.mkdir(parents=True, exist_ok=True)
+    hparams["output_path"] = args.output_path
 
     device = torch.device("cuda", args.local_rank)
 
     model = object_from_dict(hparams["model"])
+
+    model = nn.Sequential(model, nn.Softmax(dim=1))
+
     model = model.to(device)
 
     if args.fp16:
@@ -92,7 +97,7 @@ def main():
         file_paths += sorted([x for x in tqdm(args.input_path.rglob(regexp))])
 
     # Filter file paths for which we already have predictions
-    file_paths = [x for x in file_paths if not (args.output_path / x.parent.name / f"{x.stem}.png").exists()]
+    file_paths = [x for x in file_paths if not (args.output_path / x.parent.name / f"{x.stem}.txt").exists()]
 
     dataset = InferenceDataset(file_paths, transform=from_dict(hparams["test_aug"]))
 
@@ -127,9 +132,6 @@ def predict(dataloader, model, hparams, device):
                 torched_images = torched_images.half()
 
             image_paths = batch["image_path"]
-            pads = batch["pads"]
-            heights = batch["original_height"]
-            widths = batch["original_width"]
 
             batch_size = torched_images.shape[0]
 
@@ -139,14 +141,10 @@ def predict(dataloader, model, hparams, device):
                 file_id = Path(image_paths[batch_id]).stem
                 folder_name = Path(image_paths[batch_id]).parent.name
 
-                mask = (predictions[batch_id][0].cpu().numpy() > 0).astype(np.uint8) * 255
-                mask = unpad_from_size(pads, image=mask)["image"]
-                mask = cv2.resize(
-                    mask, (widths[batch_id].item(), heights[batch_id].item()), interpolation=cv2.INTER_NEAREST
-                )
+                prob = predictions[batch_id][0].cpu().numpy().astype(np.float16)
 
-                (hparams["output_mask_path"] / folder_name).mkdir(exist_ok=True, parents=True)
-                cv2.imwrite(str(hparams["output_mask_path"] / folder_name / f"{file_id}.png"), mask)
+                with open(str(hparams["output_path"] / folder_name / f"{file_id}.txt")) as f:
+                    f.write(prob)
 
 
 if __name__ == "__main__":

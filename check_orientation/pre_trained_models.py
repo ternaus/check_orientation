@@ -1,16 +1,16 @@
 from collections import namedtuple
+
+from iglovikov_helper_functions.dl.pytorch.utils import rename_layers
+from timm import create_model as timm_create_model
 from torch import nn
 from torch.utils import model_zoo
-from iglovikov_helper_functions.dl.pytorch.utils import rename_layers
-
-from segmentation_models_pytorch import Unet
 
 model = namedtuple("model", ["url", "model"])
 
 models = {
-    "Unet_2020-10-30": model(
-        url="https://github.com/ternaus/cloths_segmentation/releases/download/0.0.1/weights.zip",
-        model=Unet(encoder_name="timm-efficientnet-b3", classes=1, encoder_weights=None),
+    "resnet18_2020-11-07": model(
+        model=timm_create_model("swsl_resnet18", pretrained=False, num_classes=4),
+        url="https://github.com/ternaus/check_orientation/releases/download/v0.0.1/2020-11-07_resnet18.zip",
     )
 }
 
