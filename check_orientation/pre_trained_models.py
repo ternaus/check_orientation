@@ -12,7 +12,11 @@ models = {
     "resnet18_2020-11-07": model(
         model=timm_create_model("swsl_resnet18", pretrained=False, num_classes=4),
         url="https://github.com/ternaus/check_orientation/releases/download/v0.0.1/2020-11-07_resnet18.zip",
-    )
+    ),
+    "swsl_resnext50_32x4d": model(
+        model=timm_create_model("swsl_resnext50_32x4d", pretrained=False, num_classes=4),
+        url="https://github.com/ternaus/check_orientation/releases/download/v0.0.2/2020-11-08_resnext50_32x4d.zip",
+    ),
 }
 
 
