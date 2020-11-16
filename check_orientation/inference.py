@@ -72,7 +72,7 @@ def main():
     args.output_path.mkdir(parents=True, exist_ok=True)
     hparams["output_path"] = args.output_path
 
-    device = torch.device("cuda", args.local_rank)
+    device = torch.device("cuda", args.local_rank)  # pylint: disable=E1101
 
     model = object_from_dict(hparams["model"])
 
@@ -94,7 +94,7 @@ def main():
     file_paths = []
 
     for regexp in ["*.jpg", "*.png", "*.jpeg", "*.JPG"]:
-        file_paths += sorted([x for x in tqdm(args.input_path.rglob(regexp))])
+        file_paths += sorted(args.input_path.rglob(regexp))
 
     # Filter file paths for which we already have predictions
     file_paths = [x for x in file_paths if not (args.output_path / x.parent.name / f"{x.stem}.txt").exists()]
