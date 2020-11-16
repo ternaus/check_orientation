@@ -45,10 +45,10 @@ class CheckOrientation(pl.LightningModule):
         self.train_accuracy = pl.metrics.Accuracy()
         self.val_accuracy = pl.metrics.Accuracy()
 
-    def forward(self, batch: torch.Tensor) -> torch.Tensor:  # type: ignore
+    def forward(self, batch):
         return self.model(batch)
 
-    def setup(self, stage=0):
+    def setup(self, stage=0):  # pylint: disable=W0613
         self.train_image_paths = sorted(train_image_path.glob("*.jpg"))
         self.val_image_paths = sorted(val_image_path.glob("*.jpg"))
 
@@ -101,7 +101,7 @@ class CheckOrientation(pl.LightningModule):
 
         return self.optimizers, [scheduler]
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch, batch_idx):  # pylint: disable=W0613
         features = batch["features"]
         targets = batch["targets"]
 
@@ -121,7 +121,7 @@ class CheckOrientation(pl.LightningModule):
         lr = [x["lr"] for x in self.optimizers[0].param_groups][0]  # type: ignore
         return torch.Tensor([lr])[0].cuda()
 
-    def validation_step(self, batch, batch_id):
+    def validation_step(self, batch, batch_id):  # pylint: disable=W0613
         features = batch["features"]
         targets = batch["targets"].long()
 
