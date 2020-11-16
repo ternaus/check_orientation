@@ -29,7 +29,7 @@ def get_args():
     arg("-c", "--config_path", type=Path, help="Path to config.", required=True)
     arg("-o", "--output_path", type=Path, help="Path to save masks.", required=True)
     arg("-b", "--batch_size", type=int, help="batch_size", default=1)
-    arg("-j", "--num_workers", type=int, help="num_workers", default=12)
+    arg("-j", "--num_workers", type=int, help="num_workers", default=4)
     arg("-w", "--weight_path", type=str, help="Path to weights.", required=True)
     arg("--world_size", default=-1, type=int, help="number of nodes for distributed training")
     arg("--local_rank", default=-1, type=int, help="node rank for distributed training")
@@ -76,16 +76,15 @@ def main():
 
     model = object_from_dict(hparams["model"])
 
-    model = nn.Sequential(model, nn.Softmax(dim=1))
+    corrections: Dict[str, str] = {"model.": ""}
+    state_dict = state_dict_from_disk(file_path=args.weight_path, rename_in_layers=corrections)
+    model.load_state_dict(state_dict)
 
+    model = nn.Sequential(model, nn.Softmax(dim=1))
     model = model.to(device)
 
     if args.fp16:
         model = model.half()
-
-    corrections: Dict[str, str] = {"model.": ""}
-    state_dict = state_dict_from_disk(file_path=args.weight_path, rename_in_layers=corrections)
-    model.load_state_dict(state_dict)
 
     model = torch.nn.parallel.DistributedDataParallel(
         model, device_ids=[args.local_rank], output_device=args.local_rank
@@ -141,10 +140,12 @@ def predict(dataloader, model, hparams, device):
                 file_id = Path(image_paths[batch_id]).stem
                 folder_name = Path(image_paths[batch_id]).parent.name
 
-                prob = predictions[batch_id][0].cpu().numpy().astype(np.float16)
+                prob = predictions[batch_id].cpu().numpy().astype(np.float16)
 
-                with open(str(hparams["output_path"] / folder_name / f"{file_id}.txt")) as f:
-                    f.write(prob)
+                (hparams["output_path"] / folder_name).mkdir(exist_ok=True, parents=True)
+
+                with open(str(hparams["output_path"] / folder_name / f"{file_id}.txt"), "w") as f:
+                    f.write(str(prob.tolist()))
 
 
 if __name__ == "__main__":

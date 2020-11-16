@@ -21,7 +21,6 @@ trainer:
   gradient_clip_val: 5.0
   num_sanity_val_steps: 2
   sync_batchnorm: True
-#  resume_from_checkpoint: 2020-11-05/epoch=9.ckpt
 
 
 scheduler:
