@@ -4,8 +4,8 @@ from typing import Any, Dict, List
 
 import albumentations as albu
 import numpy as np
+from iglovikov_helper_functions.dl.pytorch.utils import tensor_from_rgb_image
 from iglovikov_helper_functions.utils.image_utils import load_rgb
-from pytorch_toolbelt.utils.torch_utils import tensor_from_rgb_image
 from torch.utils.data import Dataset
 
 
@@ -38,6 +38,6 @@ class ClassificationDataset(Dataset):
         image = self.transform(image=image)["image"]
 
         orientation = random.randint(0, 3)
-        image = np.rot90(image, orientation)
+        image = np.ascontiguousarray(np.rot90(image, orientation))
 
         return {"image_id": image_path.stem, "features": tensor_from_rgb_image(image), "targets": orientation}

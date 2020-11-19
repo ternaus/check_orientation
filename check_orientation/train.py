@@ -1,7 +1,6 @@
 import argparse
 import os
 from pathlib import Path
-from typing import Dict
 
 import pytorch_lightning as pl
 import torch
@@ -9,7 +8,6 @@ import yaml
 from addict import Dict as Adict
 from albumentations.core.serialization import from_dict
 from iglovikov_helper_functions.config_parsing.utils import object_from_dict
-from iglovikov_helper_functions.dl.pytorch.utils import state_dict_from_disk
 from pytorch_lightning.loggers import WandbLogger
 from torch.utils.data import DataLoader
 
@@ -32,15 +30,6 @@ class CheckOrientation(pl.LightningModule):
         self.hparams = hparams
 
         self.model = object_from_dict(self.hparams.model)
-        if "resume_from_checkpoint" in self.hparams:
-            corrections: Dict[str, str] = {"model.": ""}
-
-            state_dict = state_dict_from_disk(
-                file_path=self.hparams["resume_from_checkpoint"],
-                rename_in_layers=corrections,
-            )
-            self.model.load_state_dict(state_dict)
-
         self.loss = object_from_dict(self.hparams.loss)
         self.train_accuracy = pl.metrics.Accuracy()
         self.val_accuracy = pl.metrics.Accuracy()
